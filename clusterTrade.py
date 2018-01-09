@@ -1,58 +1,61 @@
-print(__doc__)
-
-# Author: Phil Roth <mr.phil.roth@gmail.com>
-# License: BSD 3 clause
-
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+import matplotlib.pyplot as pl
 
-from sklearn.cluster import KMeans
-from sklearn.datasets import make_blobs
 
-plt.figure(figsize=(12, 12))
+##first we get the import and the export in two dataframe using panda 
+all_import=pd.read_csv("data/final_table_dist-export.csv") #this should reflect the path where you downlad the dataset
+all_export=pd.read_csv("data/final_table_dist-import.csv") #this should reflect the path where you downlad the dataset
 
-df=pd.read_csv("../../../dev/trieste-lens/data/final_table_dist-export.csv")
 
-pl.scatter(X[:, 0], X[:, 1], c=y_pred)
+imp_boat_type=all_import.groupby(['port','type'])['boat'].sum().unstack() #we use the groupby function of pandas dateframe to count the total number of boat for both type (vessel vs steamboat) for each port
+exp_boat_type=all_export.groupby(['port','type'])['boat'].sum().unstack() #same for export
 
-n_samples = 1500
-random_state = 170
-X, y = make_blobs(n_samples=n_samples, random_state=random_state)
 
-# Incorrect number of clusters
-y_pred = KMeans(n_clusters=2, random_state=random_state).fit_predict(X)
+###plot the graph:
 
-plt.subplot(221)
-plt.title("Incorrect Number of Blobs")
+pl.subplot(121) #subrgraph for export
+pl.plot(range(1,1000000),range(1,1000000))  #the x=y line to see if ratio > or < 1 
+pl.scatter(exp_boat_type['vessel'],exp_boat_type['steamboat'])  #plot the port given number of vessel and number of steamboat
 
-# Anisotropicly distributed data
-transformation = [[0.60834549, -0.63667341], [-0.40887718, 0.85253229]]
-X_aniso = np.dot(X, transformation)
-y_pred = KMeans(n_clusters=3, random_state=random_state).fit_predict(X_aniso)
+#we add label to the plot !!!Problem here: in the data set there are spaces in the port names for aestetical reason, python doesn't like it
+for label in exp_boat_type.index:
+    pl.annotate(label,(exp_boat_type['vessel'][label],exp_boat_type['steamboat'][label]))  #add the name of the port on the plot
+#exp_boat_type.index allow to get the name of the port
 
-plt.subplot(222)
-plt.scatter(X_aniso[:, 0], X_aniso[:, 1], c=y_pred)
-plt.title("Anisotropicly Distributed Blobs")
+#set axes in log scale
+pl.semilogx()
+pl.semilogy() 
 
-# Different variance
-X_varied, y_varied = make_blobs(n_samples=n_samples,
-                                        cluster_std=[1.0, 2.5, 0.5],
-                                                                        random_state=random_state)
-y_pred = KMeans(n_clusters=3, random_state=random_state).fit_predict(X_varied)
+#set a title for the subgraph
+pl.title("export")
 
-plt.subplot(223)
-plt.scatter(X_varied[:, 0], X_varied[:, 1], c=y_pred)
-plt.title("Unequal Variance")
 
-# Unevenly sized blobs
-X_filtered = np.vstack((X[y == 0][:500], X[y == 1][:100], X[y == 2][:10]))
-y_pred = KMeans(n_clusters=3,
-                        random_state=random_state).fit_predict(X_filtered)
+###We do all the same to plot the graph for the import:
+pl.subplot(122)
+pl.plot(range(1,1000000),range(1,1000000)) 
+pl.scatter(imp_boat_type['vessel'],imp_boat_type['steamboat'])  #plot the port given number of vessel and number of steamboat
+for label in imp_boat_type.index:
+    pl.annotate(label,(exp_boat_type['vessel'][label],exp_boat_type['steamboat'][label]))  #add the name of the port on the plot
 
-plt.subplot(224)
-plt.scatter(X_filtered[:, 0], X_filtered[:, 1], c=y_pred)
-plt.title("Unevenly Sized Blobs")
+pl.semilogx()
+pl.semilogy() 
 
-plt.show()
+
+
+pl.title("import")
+
+
+pl.show()
+
+###it sould be easy to look at how this is evolving through by looking at the data for every year wit something like that:
+
+for y in range(min(all_import.year),max(all_import.year)):
+    subimport=all_import[all_import.year == y] #we filter the dataframe and select only the row where the column year is equal to the year
+    imp_boat_type=subimport.groupby(['port','type'])['boat'].sum().unstack() 
+    subexport=all_export[all_export.year == y]
+    exp_boat_type=subexport.groupby(['port','type'])['boat'].sum().unstack() 
+    #then we could do all the same that what we did previously
+    
 
 
