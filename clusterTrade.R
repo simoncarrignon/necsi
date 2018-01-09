@@ -42,8 +42,8 @@ rttype=type[,1]/type[,2]
 plot(sort(rttype),axes=F,log="y",ylab="ratio steam/vessel",xlab="",main="export") 
 axis(2)
 axis(1,labels=names(sort(rttype)),at=1:length(sort(rttype)),las=3)
+dev.off()
 
-typeE=tapply(testimp$boat , testexp[,c("port","type")], sum)
 
 
 
