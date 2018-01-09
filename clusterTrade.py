@@ -19,7 +19,7 @@ pl.plot(range(1,1000000),range(1,1000000))  #the x=y line to see if ratio > or <
 pl.scatter(exp_boat_type['vessel'],exp_boat_type['steamboat'])  #plot the port given number of vessel and number of steamboat
 
 #we add label to the plot !!!WARNING Problem here: in the dataset there are spaces in the port names for aestetical reason, python doesn't like it so this loop doesn't work
-for label in exp_boat_type.index:
+for label in list(exp_boat_type.index):
     pl.annotate(label,(exp_boat_type['vessel'][label],exp_boat_type['steamboat'][label]))  #add the name of the port on the plot
 
 #set axes in log scale
@@ -34,8 +34,10 @@ pl.title("export")
 pl.subplot(122)
 pl.plot(range(1,1000000),range(1,1000000)) 
 pl.scatter(imp_boat_type['vessel'],imp_boat_type['steamboat']) 
-for label in imp_boat_type.index:
-    pl.annotate(label,(exp_boat_type['vessel'][label],exp_boat_type['steamboat'][label]))  
+
+for label in list(imp_boat_type.index):
+    pl.annotate(label,(imp_boat_type['vessel'][label],imp_boat_type['steamboat'][label]))  
+
 pl.semilogx()
 pl.semilogy() 
 pl.title("import")
